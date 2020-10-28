@@ -1,2 +1,2 @@
-release: python db_ops.py
+release: python db.py
 web: gunicorn server:app
