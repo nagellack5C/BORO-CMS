@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Управление новостями</title>
+    <script src="https://cdn.tiny.cloud/1/edmp0853p8jy5tk8jqdy0vpzu6rme6tutlhspcyehy69ft5x/tinymce/5/tinymce.min.js" referrerpolicy="origin"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.7.2/min/dropzone.min.js" integrity="sha512-9WciDs0XP20sojTJ9E7mChDXy6pcO0qHpwbEJID1YVavz2H6QBz5eLoDD8lseZOb2yGT8xDNIV7HIe1ZbuiDWg==" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.7.2/basic.css" integrity="sha512-Ucip2staDcls3OuwEeh5s9rRVYBsCA4HRr18+qd0Iz3nYpnfUeCIMh/82aHKeYgdaXGebmi9vcREw7YePXsutQ==" crossorigin="anonymous" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.7.2/dropzone.css" integrity="sha512-CmjeEOiBCtxpzzfuT2remy8NP++fmHRxR3LnsdQhVXzA3QqRMaJ3heF9zOB+c1lCWSwZkzSOWfTn1CdqgkW3EQ==" crossorigin="anonymous" />
+    <script>
+        tinymce.init({
+            selector: '#news_text'
+        });
+        console.log('aye');
+    </script>
+</head>
+<body>
+    <h1>Добавить новость</h1>
+    <input id="date" type="date">
+    <textarea id="news_text" name="news_text">
+      Hello, World!
+    </textarea>
+    <div id="dropzone">
+        <form action="#" class="dropzone needsclick" id="upload">
+            <div class="dz-message needsclick">
+                <button type="button" class="dz-button">Перетащите файлы сюда или нажмите для загрузки через Проводник.</button>
+            </div>
+        </form>
+    </div>
+    <button id="save">Сохранить</button>
+</body>
+
+<script>
+    function getValues() {
+        var formData = new FormData();
+        // these image appends are getting dropzones instances
+        formData.append('image', $('#upload')[0].dropzone.getAcceptedFiles()[0]);
+
+        return formData;
+    }
+
+    $("#save").click(function() {
+        // var datastring = new FormData($("input.dz-hidden-input")[0]);
+        $.ajax({
+            method: "POST",
+            url: window.location.pathname,
+            data: {
+                text: tinymce.get("news_text").getContent(),
+                date: $("#date").val()
+            },
+            cache: false,
+            contentType: false,
+            processData: false
+        });
+        $.ajax({
+            method: "POST",
+            url: window.location.pathname,
+            data: getValues(),
+            processData: false,
+            contentType: false
+        });
+    });
+</script>
+<script>
+    var today = new Date();
+    var dd = String(today.getDate()).padStart(2, '0');
+    var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
+    var yyyy = today.getFullYear();
+
+    today = yyyy + '-' + mm + '-' + dd;
+    $("#date").val(today);
+</script>
+
+</html>
+

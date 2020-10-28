@@ -1,0 +1,94 @@
+{% extends 'bootstrap/base.html' %}
+{# https://coolors.co/e63946-f1faee-a8dadc-457b9d-1d3557 #}
+{% block styles %}
+<link href="{{bootstrap_find_resource('css/bootstrap.css', cdn='bootstrap')}}" rel="stylesheet">
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400;1,600;1,700&display=swap');
+    h1, h2, h3, h4, p {
+        color: #1d3557;
+        font-family: 'Open Sans', sans-serif;
+        font-weight: 300;
+    }
+    a, h4 {
+        font-weight: 400;
+    }
+    body {
+        background-color: #f1faee;
+    }
+    .left-menu {
+        background-color: #a8dadc;
+    }
+</style>
+{% endblock %}
+
+{% block title %}
+{% if title %}{{ title }} - {% endif %}Сайт МОУ СОШ №3
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="col-md-2">
+        <img src="{{url_for('static', filename='global/topleft.jpg')}}" class="img-fluid img-thumbnail">
+    </div>
+    <div class="col-md-8 text-center">
+        <h1>Муниципальное бюджетное общеобразовательное учреждение
+        средняя общеобразовательная школа №3
+            г. Бородино Красноярского края</h1>
+        {% if title %}<h2>{{ title }}</h2>{% endif %}
+    </div>
+    <div class="col-md-2">
+        <img src="{{url_for('static', filename='global/topright.png')}}" class="img-fluid img-thumbnail">
+    </div>
+</div>
+
+<div class="container-fluid">
+
+    <div class="col-md-2">
+        {% for item in left_menu %}
+            <div class="text-center left-menu" style="padding: 5px 7px 5px 7px; margin: 5px; border-radius: 25px">
+                <a href="{{ item.1 }}">
+                    <h4>{{ item.0 }}</h4>
+                </a>
+            </div>
+        {% endfor %}
+    </div>
+
+    <div class="col-md-8">
+        {% block center_content -%}
+        {%- endblock center_content %}
+    </div>
+
+    <div class="col-md-2 text-center">
+        <div style="padding-bottom: 10px">
+            <a href="">
+                <img src="{{url_for('static', filename='global/gosu_banner.jpg')}}" class="img-fluid img-rounded">
+            </a>
+        </div>
+        <div style="padding-bottom: 10px">
+            <a href="">
+                <img src="{{url_for('static', filename='global/rating.png')}}" class="img-fluid img-rounded">
+            </a>
+        </div>
+        <div style="padding-bottom: 10px">
+            <a href="">
+                <img src="{{url_for('static', filename='global/doverie.png')}}" class="img-fluid img-rounded">
+            </a>
+        </div>
+        <div style="padding-bottom: 10px">
+            <a href="">
+                <img src="{{url_for('static', filename='global/dnevnik.png')}}" class="img-fluid img-rounded">
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="container-fluid text-center">
+    <p>Наш адрес: 663980, Красноярский край, город Бородино, мкр. Стахановский, д. 3.</p>
+    <p>Телефон/факс: <a href="tel:+73916846310">+7(39168)46310</a></p>
+
+    <p>Электронный адрес: <a href="mailto:bschool-3@yandex.ru">bschool-3@yandex.ru</a></p>
+    <p>Редакция сайта: <a href="mailto:ivettaklimova@yandex.ru">ivettaklimova@yandex.ru</a></p>
+    <p>© 2007-{{ year }}. <a href="https://vk.com/aoklimov">Сайт создан Климовым А.О.</a></p>
+    <p>Последнее обновление: {{ date }}</p>
+</div>
+{% endblock %}

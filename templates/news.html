@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+{% block center_content %}
+    {% for item in news %}
+        <div>
+            <b>{{ item.date }}</b> {{ item.text }}
+            <p align="center">
+                {% for image in item.images %}
+                    <img src="image" height="250" style="margin: 0px 5px 0px 5px;">
+                {% endfor %}
+            </p>
+        </div>
+    {% endfor %}
+{% endblock %}
