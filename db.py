@@ -28,5 +28,9 @@ def get_next_10_news(offset=0):
 
 
 def init_db():
+    db.drop_tables([News])
     db.create_tables([News])
 
+
+if __name__ == '__main__':
+    init_db()
