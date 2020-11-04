@@ -10,9 +10,11 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.7.2/dropzone.css" integrity="sha512-CmjeEOiBCtxpzzfuT2remy8NP++fmHRxR3LnsdQhVXzA3QqRMaJ3heF9zOB+c1lCWSwZkzSOWfTn1CdqgkW3EQ==" crossorigin="anonymous" />
     <script>
         tinymce.init({
-            selector: '#news_text'
+            selector: '#news_text',
+            plugins: 'link',
+            toolbar: 'undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | outdent indent | link',
+            default_link_target: '_blank'
         });
-        console.log('aye');
     </script>
 </head>
 <body>
@@ -21,55 +23,16 @@
     <textarea id="news_text" name="news_text">
       Hello, World!
     </textarea>
-    <div id="dropzone">
-        <form action="#" class="dropzone needsclick" id="upload">
-            <div class="dz-message needsclick">
-                <button type="button" class="dz-button">Перетащите файлы сюда или нажмите для загрузки через Проводник.</button>
-            </div>
-        </form>
+    <div id="drop" class="dropzone dz-clickable">
+        <div class="dz-message">Нажмите для загрузки или перетащите файл (только картинки!)</div>
     </div>
-    <button id="save">Сохранить</button>
-    <div id="loader">
-
+    <div align="center">
+        <button id="save">Сохранить</button>
+        <div id="loader"></div>
     </div>
 </body>
 
 <script>
-
-    function getValues() {
-        var formData = new FormData();
-        // these image appends are getting dropzones instances
-        var files = $('#upload')[0].dropzone.getAcceptedFiles();
-        for (var i = 0; i < files.length; i++) {
-            formData.append('image', files[i]);
-        }
-        formData.append('text', tinymce.get("news_text").getContent());
-        formData.append('date', $("#date").val());
-
-        return formData;
-    }
-
-    $("#save").click(function() {
-        $.ajax({
-            method: "POST",
-            url: window.location.pathname,
-            data: getValues(),
-            processData: false,
-            contentType: false,
-            beforeSend: function( xhr ) {
-                $("#loader").html("Загружаем...");
-            },
-            success: function(msg) {
-                $("#loader").html("Загружено!");
-                setTimeout(function () {
-                    $("#loader").html("");
-                }, 1000)
-            },
-            error: function() {
-                $("#loader").html("Упс, что-то пошло не так!");
-            }
-        });
-    });
 
     var today = new Date();
     var dd = String(today.getDate()).padStart(2, '0');
@@ -78,6 +41,74 @@
 
     today = yyyy + '-' + mm + '-' + dd;
     $("#date").val(today);
+
+    Dropzone.autoDiscover = false;
+    $(document).ready(function(){
+        window.onload = function() {
+            var dzOptions = {
+                url: "/admin_news",
+                dictDefaultMessage: "Перетащите файлы сюда или нажмите для загрузки через Проводник.",
+                clickable: true,
+                uploadMultiple: true,
+                addRemoveLinks: true,
+                acceptedFiles: "image/*",
+                autoProcessQueue: false,
+                parallelUploads: 10,
+                init: function () {
+                    var myDropzone = this;
+
+                    $("#save").click(function (e) {
+                        e.preventDefault();
+                        if (this.files) {
+                            myDropzone.processQueue();
+                        } else {
+                            // send an ajax by hand if no files loaded
+                            var formData = new FormData();
+                            formData.append('text', tinymce.get("news_text").getContent());
+                            formData.append('date', $("#date").val());
+
+                            $.ajax({
+                                method: "POST",
+                                url: window.location.pathname,
+                                data: formData,
+                                processData: false,
+                                contentType: false,
+                                beforeSend: function( xhr ) {
+                                    $("#loader").html("Загружаем...");
+                                },
+                                success: function(msg) {
+                                    $("#loader").html("Загружено!");
+                                    setTimeout(function () {
+                                        $("#loader").html("");
+                                    }, 2000)
+                                },
+                                error: function() {
+                                    $("#loader").html("Упс, что-то пошло не так!");
+                                }
+                            });
+                        }
+                    });
+
+                    this.on('sending', function(file, xhr, formData) {
+                        formData.append('text', tinymce.get("news_text").getContent());
+                        formData.append('date', $("#date").val());
+                        $("#loader").html("Загружаем...");
+                    });
+
+                    this.on("complete", function() {
+                        $("#loader").html("Загружено!");
+                        setTimeout(function () {
+                            myDropzone.removeAllFiles();
+                            $("#loader").html("");
+                        }, 2000); // <3 JS
+                    });
+                }
+            };
+
+            var uploader = document.querySelector('#drop');
+            var newDropzone = new Dropzone(uploader, dzOptions);
+        };
+    });
 </script>
 
 </html>
