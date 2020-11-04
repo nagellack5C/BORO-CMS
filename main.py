@@ -40,7 +40,8 @@ def admin_news():
         news_id = add_news(date, text)
         if images:
             for image in images:
-                add_image(image.filename.lower(), f'news/{news_id}', image.read())
+                if image.content_type.startswith('image/'):
+                    add_image(image.filename.lower(), f'news/{news_id}', image.read())
         return jsonify(success=True)
 
 
