@@ -29,9 +29,13 @@
         </form>
     </div>
     <button id="save">Сохранить</button>
+    <div id="loader">
+
+    </div>
 </body>
 
 <script>
+
     function getValues() {
         var formData = new FormData();
         // these image appends are getting dropzones instances
@@ -41,35 +45,32 @@
         }
         formData.append('text', tinymce.get("news_text").getContent());
         formData.append('date', $("#date").val());
-        // formData.append('image', $('#upload')[0].dropzone.getAcceptedFiles());
 
         return formData;
     }
 
     $("#save").click(function() {
-        // var datastring = new FormData($("input.dz-hidden-input")[0]);
-        // $.ajax({
-        //     method: "POST",
-        //     url: window.location.pathname,
-        //     data: {
-        //         text: tinymce.get("news_text").getContent(),
-        //         date: $("#date").val(),
-        //         images: getValues()
-        //     },
-        //     cache: false,
-        //     contentType: 'multipart/form-data',
-        //     processData: false
-        // });
         $.ajax({
             method: "POST",
             url: window.location.pathname,
             data: getValues(),
             processData: false,
-            contentType: false
+            contentType: false,
+            beforeSend: function( xhr ) {
+                $("#loader").html("Загружаем...");
+            },
+            success: function(msg) {
+                $("#loader").html("Загружено!");
+                setTimeout(function () {
+                    $("#loader").html("");
+                }, 1000)
+            },
+            error: function() {
+                $("#loader").html("Упс, что-то пошло не так!");
+            }
         });
     });
-</script>
-<script>
+
     var today = new Date();
     var dd = String(today.getDate()).padStart(2, '0');
     var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
