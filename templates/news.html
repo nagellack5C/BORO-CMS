@@ -4,8 +4,8 @@
             <b>{{ item.date }}</b> {{ item.text|safe }}
             <p align="center">
                 {% for img_link in item.img_links %}
-                        <a href="{{ img_link }}/full">
-                            <img src="{{ img_link }}/thumb" style="margin: 0px 5px 0px 5px;">
+                        <a href="{{ img_link }}/full" target="_blank">
+                            <img src="{{ img_link }}/thumb" height="250" style="margin: 0px 5px 0px 5px;">
                         </a>&nbsp;
                 {% endfor %}
             </p>
