@@ -15,12 +15,23 @@ import test_endpoints
 
 
 @app.route('/')
-def news():
+def main_page():
     """
     Render the main page with news.
     """
     return render_template('base.html', title='Главная страница', news=
-                           get_news(0, 10), templates=["news.html"])
+                           get_news(0, 10), templates=["news.html", "news_scroll.html"])
+
+
+@app.route('/news/<offset>')
+def news(offset):
+    news = get_news(offset, 10)
+    print(offset)
+    print(news)
+    if news:
+        return render_template('news.html', news=news, templates=["news.html"])
+    else:
+        return jsonify('No content'), 204
 
 
 @app.route('/admin_news', methods=['GET', 'POST'])
