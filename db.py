@@ -1,6 +1,7 @@
 import os
 import io
 from urllib.parse import urlparse
+from unidecode import unidecode
 from PIL import Image
 from peewee import *
 
@@ -65,7 +66,7 @@ def get_news(offset, limit, id=None):
         return [new for new in News.select().where(News.id == id).execute()][0]
 
     news = [item for item in
-            News.select().order_by(News.id.desc()).offset(offset).limit(limit).execute()]
+            News.select().order_by(News.date.desc()).offset(offset).limit(limit).execute()]
 
     def get_image_src_links(news_id):
         """
@@ -109,6 +110,7 @@ def add_image(image_name, image_folder, image_bytes):
     :param image_bytes: image as a bytes sequence.
     :return:
     """
+    image_name = unidecode(image_name)
     if len(image_name) > 60:
         image_name = image_name[-60:]
     img = Image.open(io.BytesIO(image_bytes))
