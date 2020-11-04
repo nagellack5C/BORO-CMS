@@ -6,8 +6,8 @@
             <p align="center">
                 {% for img_link in item.img_links %}
                         <a href="{{ img_link }}/full" target="_blank">
-                            <img src="{{ img_link }}/thumb" height="250" style="margin: 0px 5px 0px 5px;">
-                        </a>&nbsp;
+                            <img class="news-img" src="{{ img_link }}/thumb" height="250">
+                        </a>
                 {% endfor %}
             </p>
         </div>
