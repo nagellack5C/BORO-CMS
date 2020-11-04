@@ -54,8 +54,9 @@
     </div>
 
     <div class="col-md-8">
-        {% block center_content -%}
-        {%- endblock center_content %}
+        {% for template in templates %}
+            {% include template %}
+        {% endfor %}
     </div>
 
     <div class="col-md-2 text-center">
