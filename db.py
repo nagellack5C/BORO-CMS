@@ -109,6 +109,8 @@ def add_image(image_name, image_folder, image_bytes):
     :param image_bytes: image as a bytes sequence.
     :return:
     """
+    if len(image_name) > 60:
+        image_name = image_name[-60:]
     img = Image.open(io.BytesIO(image_bytes))
     img.thumbnail((250, 250))
     thumb = io.BytesIO()
