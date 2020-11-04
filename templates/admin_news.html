@@ -59,7 +59,7 @@
 
                     $("#save").click(function (e) {
                         e.preventDefault();
-                        if (this.files) {
+                        if (myDropzone.files.length > 0) {
                             myDropzone.processQueue();
                         } else {
                             // send an ajax by hand if no files loaded
