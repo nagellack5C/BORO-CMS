@@ -43,18 +43,17 @@ def admin_news():
     if request.method == 'GET':
         return render_template('admin_news.html')
     if request.method == 'POST':
-        images = request.files.getlist('image')
         date = request.form['date']
         text = request.form['text']
         if not (date and text):
             return jsonify(success=False)
         news_id = add_news(date, text)
-        if images:
-            for image in images:
+        if request.files:
+            for image in request.files.values():
                 if image.content_type.startswith('image/'):
+                    print(image)
                     add_image(image.filename.lower(), f'news/{news_id}', image.read())
         return jsonify(success=True)
-
 
 
 @app.route('/images/<folder>/<item_id>/<image_name>')
