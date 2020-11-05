@@ -43,7 +43,6 @@
     $("#date").val(today);
 
     Dropzone.autoDiscover = false;
-    $(document).ready(function(){
         window.onload = function() {
             var dzOptions = {
                 url: "/admin_news",
@@ -108,7 +107,6 @@
             var uploader = document.querySelector('#drop');
             var newDropzone = new Dropzone(uploader, dzOptions);
         };
-    });
 </script>
 
 </html>
