@@ -1,8 +1,9 @@
-import os
+import json
 from datetime import datetime
 from flask import Flask, render_template, request, make_response, jsonify
 from flask_bootstrap import Bootstrap
 from db import get_news, add_news, add_image, get_image_from_db
+from html_builder import process_editorjs_text
 
 app = Flask(__name__)
 Bootstrap(app)
@@ -12,6 +13,7 @@ import test_endpoints
 # export FLASK_APP=main.py
 # export FLASK_ENV=development
 # flask run
+# docker run --rm -P --name pg_test -e POSTGRES_PASSWORD=password -p 5432:5432 postgres
 
 
 @app.route('/')
@@ -44,16 +46,26 @@ def admin_news():
         return render_template('admin_news.html')
     if request.method == 'POST':
         date = request.form['date']
-        text = request.form['text']
+        text = json.loads(request.form['text'])
+        text = process_editorjs_text(text)
         if not (date and text):
             return jsonify(success=False)
         news_id = add_news(date, text)
         if request.files:
             for image in request.files.values():
                 if image.content_type.startswith('image/'):
-                    print(image)
                     add_image(image.filename.lower(), f'news/{news_id}', image.read())
         return jsonify(success=True)
+
+
+@app.route('/admin_docs')
+def admin_docs():
+    """
+    GET: render the admin page where the admin can add news.
+    POST: read and parse news requests made on this page.
+    """
+    if request.method == 'GET':
+        return render_template('admin_docs.html')
 
 
 @app.route('/images/<folder>/<item_id>/<image_name>')
