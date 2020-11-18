@@ -1,113 +1,63 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Управление новостями</title>
-    <script src="https://cdn.tiny.cloud/1/edmp0853p8jy5tk8jqdy0vpzu6rme6tutlhspcyehy69ft5x/tinymce/5/tinymce.min.js" referrerpolicy="origin"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.7.2/min/dropzone.min.js" integrity="sha512-9WciDs0XP20sojTJ9E7mChDXy6pcO0qHpwbEJID1YVavz2H6QBz5eLoDD8lseZOb2yGT8xDNIV7HIe1ZbuiDWg==" crossorigin="anonymous"></script>
+{% extends 'bootstrap/base.html' %}
+
+{% block head %}
+
+    {% block title %}
+        Управление новостями
+    {% endblock %}
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.7.2/basic.css" integrity="sha512-Ucip2staDcls3OuwEeh5s9rRVYBsCA4HRr18+qd0Iz3nYpnfUeCIMh/82aHKeYgdaXGebmi9vcREw7YePXsutQ==" crossorigin="anonymous" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.7.2/dropzone.css" integrity="sha512-CmjeEOiBCtxpzzfuT2remy8NP++fmHRxR3LnsdQhVXzA3QqRMaJ3heF9zOB+c1lCWSwZkzSOWfTn1CdqgkW3EQ==" crossorigin="anonymous" />
-    <script>
-        tinymce.init({
-            selector: '#news_text',
-            plugins: 'link',
-            toolbar: 'undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | outdent indent | link',
-            default_link_target: '_blank'
-        });
-    </script>
-</head>
-<body>
-    <h1>Добавить новость</h1>
-    <input id="date" type="date">
-    <textarea id="news_text" name="news_text">
-      Hello, World!
-    </textarea>
-    <div id="drop" class="dropzone dz-clickable">
-        <div class="dz-message">Нажмите для загрузки или перетащите файл (только картинки!)</div>
+
+    {% block styles %}
+    <style>
+        #editorjs {
+            background-color: azure;
+            border-radius: 10px;
+            border: 2px solid black;
+            margin: 5px 0 5px 0;
+            padding: 10px;
+        }
+
+        .ce-block {
+            background-color: white;
+            margin: 5px 0 5px 0;
+            padding: 5px;
+        }
+    </style>
+    {% endblock %}
+
+{% endblock %}
+
+
+{% block body %}
+    <div class="container-fluid">
+        <div class="row">
+            <h1>Добавить новость</h1>
+            <input id="date" type="date">
+        </div>
+
+        <div class="row">
+            <div class="col-md-8 col-md-offset-2" id="editorjs" name="editorjs"></div>
+        </div>
+
+        <div id="drop" class="dropzone dz-clickable row">
+            <div class="dz-message">Нажмите для загрузки или перетащите файл (только картинки!)</div>
+        </div>
+
+        <div class="row" align="center">
+            <button id="save">Сохранить</button>
+            <div id="loader"></div>
+        </div>
     </div>
-    <div align="center">
-        <button id="save">Сохранить</button>
-        <div id="loader"></div>
-    </div>
-</body>
 
-<script>
+{% block scripts %}
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.7.2/dropzone.js" integrity="sha512-0QMJSMYaer2wnpi+qbJOy4rOAlE6CbYImSlrgQuf2MBBMqTvK/k6ZJV126/EbdKzMAXaB6PHzdYxOX6Qey7WWw==" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@editorjs/editorjs@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@editorjs/list@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@editorjs/header@latest"></script>
+    <script src="{{url_for('static', filename='scripts/news_adder.js')}}"></script>
+{% endblock %}
 
-    var today = new Date();
-    var dd = String(today.getDate()).padStart(2, '0');
-    var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
-    var yyyy = today.getFullYear();
-
-    today = yyyy + '-' + mm + '-' + dd;
-    $("#date").val(today);
-
-    Dropzone.autoDiscover = false;
-        window.onload = function() {
-            var dzOptions = {
-                url: "/admin_news",
-                dictDefaultMessage: "Перетащите файлы сюда или нажмите для загрузки через Проводник.",
-                clickable: true,
-                uploadMultiple: true,
-                addRemoveLinks: true,
-                acceptedFiles: "image/*",
-                autoProcessQueue: false,
-                parallelUploads: 10,
-                init: function () {
-                    var myDropzone = this;
-
-                    $("#save").click(function (e) {
-                        e.preventDefault();
-                        if (myDropzone.files.length > 0) {
-                            myDropzone.processQueue();
-                        } else {
-                            // send an ajax by hand if no files loaded
-                            var formData = new FormData();
-                            formData.append('text', tinymce.get("news_text").getContent());
-                            formData.append('date', $("#date").val());
-
-                            $.ajax({
-                                method: "POST",
-                                url: window.location.pathname,
-                                data: formData,
-                                processData: false,
-                                contentType: false,
-                                beforeSend: function( xhr ) {
-                                    $("#loader").html("Загружаем...");
-                                },
-                                success: function(msg) {
-                                    $("#loader").html("Загружено!");
-                                    setTimeout(function () {
-                                        $("#loader").html("");
-                                    }, 2000)
-                                },
-                                error: function() {
-                                    $("#loader").html("Упс, что-то пошло не так!");
-                                }
-                            });
-                        }
-                    });
-
-                    this.on('sending', function(file, xhr, formData) {
-                        formData.append('text', tinymce.get("news_text").getContent());
-                        formData.append('date', $("#date").val());
-                        $("#loader").html("Загружаем...");
-                    });
-
-                    this.on("complete", function() {
-                        $("#loader").html("Загружено!");
-                        setTimeout(function () {
-                            myDropzone.removeAllFiles();
-                            $("#loader").html("");
-                        }, 2000); // <3 JS
-                    });
-                }
-            };
-
-            var uploader = document.querySelector('#drop');
-            var newDropzone = new Dropzone(uploader, dzOptions);
-        };
-</script>
-
-</html>
-
+{% endblock %}
