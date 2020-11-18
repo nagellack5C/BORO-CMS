@@ -18,8 +18,8 @@ if os.environ.get('DATABASE_URL'):
 else:
     db = PostgresqlDatabase(
         'postgres',  # Required by Peewee.
-        user='aklimov',  # Will be passed directly to psycopg2.
-        # password='password',  # Ditto.
+        user='postgres',  # Will be passed directly to psycopg2.
+        password='password',  # Ditto.
         host='localhost',  # Ditto.
         port=5432
     )
@@ -42,6 +42,27 @@ class Images(Model):
     relation_id = IntegerField(null=True) # needed to get images for e.g. particular news items
     image = BlobField()
     thumb = BlobField(null=True)
+
+    class Meta:
+        database = db
+        indexes = (
+            (('name', 'folder'), True),
+        )
+
+
+class Documents(Model):
+    """
+    Stores binary documents.
+    """
+    name = CharField(200)
+    folder = CharField(60)
+    description = TextField()
+    year = IntegerField()
+    relation_id = IntegerField(null=True)
+    tags = TextField()
+    upload_date = DateField()
+
+    document = BlobField()
 
     class Meta:
         database = db
@@ -131,8 +152,8 @@ def init_db():
     Reinit the DB.
     :return:
     """
-    db.drop_tables([News, Images])
-    db.create_tables([News, Images])
+    db.drop_tables([News, Images, Documents])
+    db.create_tables([News, Images, Documents])
 
 
 if __name__ == '__main__':
