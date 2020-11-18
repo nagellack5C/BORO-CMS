@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Управление документами</title>
+    <script src="https://cdn.tiny.cloud/1/edmp0853p8jy5tk8jqdy0vpzu6rme6tutlhspcyehy69ft5x/tinymce/5/tinymce.min.js" referrerpolicy="origin"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.7.2/min/dropzone.min.js" integrity="sha512-9WciDs0XP20sojTJ9E7mChDXy6pcO0qHpwbEJID1YVavz2H6QBz5eLoDD8lseZOb2yGT8xDNIV7HIe1ZbuiDWg==" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.7.2/basic.css" integrity="sha512-Ucip2staDcls3OuwEeh5s9rRVYBsCA4HRr18+qd0Iz3nYpnfUeCIMh/82aHKeYgdaXGebmi9vcREw7YePXsutQ==" crossorigin="anonymous" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.7.2/dropzone.css" integrity="sha512-CmjeEOiBCtxpzzfuT2remy8NP++fmHRxR3LnsdQhVXzA3QqRMaJ3heF9zOB+c1lCWSwZkzSOWfTn1CdqgkW3EQ==" crossorigin="anonymous" />
+    <script>
+        tinymce.init({
+            selector: '#news_text',
+            plugins: 'link',
+            toolbar: 'undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | outdent indent | link',
+            default_link_target: '_blank'
+        });
+    </script>
+</head>
+<body>
+<h1>Добавить документы</h1>
+<input id="date" type="date">
+<div id="drop" class="dropzone dz-clickable">
+    <div class="dz-message">Нажмите для загрузки или перетащите файл
+        (только документы! PDF, .xls/xlsx, .doc/docx, .ppt/pptx)</div>
+</div>
+<div align="center">
+    <button id="save">Сохранить</button>
+    <div id="loader"></div>
+</div>
+</body>
+
+<script>
+
+    var today = new Date();
+    var dd = String(today.getDate()).padStart(2, '0');
+    var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
+    var yyyy = today.getFullYear();
+
+    today = yyyy + '-' + mm + '-' + dd;
+    $("#date").val(today);
+
+    Dropzone.autoDiscover = false;
+    window.onload = function() {
+        var dzOptions = {
+            url: "/admin_news",
+            clickable: true,
+            uploadMultiple: true,
+            addRemoveLinks: true,
+            // acceptedFiles: "image/*",
+            autoProcessQueue: false,
+            parallelUploads: 10,
+            init: function () {
+                var myDropzone = this;
+
+                $("#save").click(function (e) {
+                    e.preventDefault();
+                    if (myDropzone.files.length > 0) {
+                        myDropzone.processQueue();
+                    } else {
+                        // send an ajax by hand if no files loaded
+                        var formData = new FormData();
+                        formData.append('text', tinymce.get("news_text").getContent());
+                        formData.append('date', $("#date").val());
+
+                        $.ajax({
+                            method: "POST",
+                            url: window.location.pathname,
+                            data: formData,
+                            processData: false,
+                            contentType: false,
+                            beforeSend: function( xhr ) {
+                                $("#loader").html("Загружаем...");
+                            },
+                            success: function(msg) {
+                                $("#loader").html("Загружено!");
+                                setTimeout(function () {
+                                    $("#loader").html("");
+                                }, 2000)
+                            },
+                            error: function() {
+                                $("#loader").html("Упс, что-то пошло не так!");
+                            }
+                        });
+                    }
+                });
+
+                this.on("addedfile", function(file) {
+                    $(".dz-preview").each(function(index){
+                        if ($(this).children("input").length == 0) {
+                            $(this).append("<input type='text' size='15'>")
+                        }
+                    });
+                });
+
+                this.on('sending', function(file, xhr, formData) {
+                    formData.append('text', tinymce.get("news_text").getContent());
+                    formData.append('date', $("#date").val());
+                    $("#loader").html("Загружаем...");
+                });
+
+                this.on("complete", function() {
+                    $("#loader").html("Загружено!");
+                    setTimeout(function () {
+                        myDropzone.removeAllFiles();
+                        $("#loader").html("");
+                    }, 2000); // <3 JS
+                });
+            }
+        };
+
+        var uploader = document.querySelector('#drop');
+        var newDropzone = new Dropzone(uploader, dzOptions);
+    };
+</script>
+
+</html>
+
