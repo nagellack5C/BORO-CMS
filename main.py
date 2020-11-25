@@ -78,7 +78,7 @@ def get_image(folder, item_id, image_name, option=False):
     :param image_name: name of image
     :param option: 'thumb' or 'full'
     """
-    if image_name.lower().endswith(('.jpg', '.png')):
+    if image_name.lower().endswith(('.jpg', '.jpeg', '.png')):
         thumb = False
         if option == 'thumb':
             thumb = True
