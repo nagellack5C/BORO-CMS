@@ -103,7 +103,8 @@ def get_news(offset, limit, id=None):
     return [{
         'date': new.date,
         'text': new.text,
-        'img_links': get_image_src_links(new.id)
+        'img_links': get_image_src_links(new.id),
+        'id': new.id
     } for new in news]
 
 
@@ -157,5 +158,6 @@ def init_db():
 
 
 if __name__ == '__main__':
-    init_db()
-    print('reinit!')
+    # init_db()
+    # print('reinit!')
+    get_news(0, 10)

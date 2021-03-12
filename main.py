@@ -10,6 +10,7 @@ Bootstrap(app)
 
 import test_endpoints
 
+
 # export FLASK_APP=main.py
 # export FLASK_ENV=development
 # flask run
@@ -22,7 +23,7 @@ def main_page():
     Render the main page with news.
     """
     return render_template('base.html', title='Главная страница', news=
-                           get_news(0, 10), templates=["news.html", "news_scroll.html"])
+    get_news(0, 10), templates=["news.html", "news_scroll.html"])
 
 
 @app.route('/news/<offset>')
@@ -43,7 +44,8 @@ def admin_news():
     POST: read and parse news requests made on this page.
     """
     if request.method == 'GET':
-        return render_template('admin_news.html')
+        return render_template('admin_news.html', news=
+        get_news(0, 10), templates=["news.html", "news_scroll.html"])
     if request.method == 'POST':
         date = request.form['date']
         text = json.loads(request.form['text'])
@@ -54,7 +56,8 @@ def admin_news():
         if request.files:
             for image in request.files.values():
                 if image.content_type.startswith('image/'):
-                    add_image(image.filename.lower(), f'news/{news_id}', image.read())
+                    add_image(image.filename.lower(), f'news/{news_id}',
+                              image.read())
         return jsonify(success=True)
 
 
@@ -83,8 +86,10 @@ def get_image(folder, item_id, image_name, option=False):
         if option == 'thumb':
             thumb = True
         if option == 'full':
-            return render_template('image.html', source_img=f'/images/{folder}/{item_id}/{image_name}')
-        image_binary = get_image_from_db(f'{folder}/{item_id}', image_name, thumb=thumb)
+            return render_template('image.html',
+                                   source_img=f'/images/{folder}/{item_id}/{image_name}')
+        image_binary = get_image_from_db(f'{folder}/{item_id}', image_name,
+                                         thumb=thumb)
         response = make_response(image_binary)
         response.headers.set('Content-Type', 'image/jpeg')
         filename = f'{folder}-{image_name}'
@@ -102,7 +107,7 @@ def template_globals():
     """
     datenow = datetime.now()
     return dict(
-        left_menu = {
+        left_menu={
             ('Сведения об образовательной организации', 'test.html'),
             ('Уставные документы учреждения', 'test.html'),
             ('Финансово-хозяйственная деятельность', 'test.html'),

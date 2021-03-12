@@ -1,7 +1,7 @@
 <div id="news">
     <hr>
     {% for item in news %}
-        <div>
+        <div class="news-item" id="news-{{ item.id }}">
             <b>{{ item.date }}</b> {{ item.text|safe }}
             <p align="center">
                 {% for img_link in item.img_links %}

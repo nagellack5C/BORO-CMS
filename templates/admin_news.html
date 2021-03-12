@@ -10,6 +10,9 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.7.2/dropzone.css" integrity="sha512-CmjeEOiBCtxpzzfuT2remy8NP++fmHRxR3LnsdQhVXzA3QqRMaJ3heF9zOB+c1lCWSwZkzSOWfTn1CdqgkW3EQ==" crossorigin="anonymous" />
 
     {% block styles %}
+
+    <link href="{{bootstrap_find_resource('css/bootstrap.css', cdn='bootstrap')}}" rel="stylesheet">
+
     <style>
         #editorjs {
             background-color: azure;
@@ -30,25 +33,40 @@
 {% endblock %}
 
 
-{% block body %}
-    <div class="container-fluid">
-        <div class="row">
-            <h1>Добавить новость</h1>
-            <input id="date" type="date">
+{% block content %}
+
+    <div id="news-form" class="container-fluid">
+        <div class="col-md-8 col-md-offset-2">
+
+            <div>
+                <h1>Добавить новость</h1>
+                <input id="date" type="date">
+            </div>
+
+            <div>
+                <div id="editorjs" name="editorjs"></div>
+            </div>
+
+            <div id="drop" class="dropzone dz-clickable">
+                <div class="dz-message">Нажмите для загрузки или перетащите файл (только картинки!)</div>
+            </div>
+
+            <div align="center">
+                <button id="save">Сохранить</button>
+                <div id="loader"></div>
+            </div>
+
+        </div>
+    </div>
+
+    <div id="news-list" class="container-fluid">
+
+        <div class="col-md-8 col-md-offset-2">
+            {% for template in templates %}
+            {% include template %}
+            {% endfor %}
         </div>
 
-        <div class="row">
-            <div class="col-md-8 col-md-offset-2" id="editorjs" name="editorjs"></div>
-        </div>
-
-        <div id="drop" class="dropzone dz-clickable row">
-            <div class="dz-message">Нажмите для загрузки или перетащите файл (только картинки!)</div>
-        </div>
-
-        <div class="row" align="center">
-            <button id="save">Сохранить</button>
-            <div id="loader"></div>
-        </div>
     </div>
 
 {% block scripts %}
@@ -58,6 +76,12 @@
     <script src="https://cdn.jsdelivr.net/npm/@editorjs/list@latest"></script>
     <script src="https://cdn.jsdelivr.net/npm/@editorjs/header@latest"></script>
     <script src="{{url_for('static', filename='scripts/news_adder.js')}}"></script>
+    <script src="{{url_for('static', filename='scripts/news_loader.js')}}"></script>
+
+    <script>
+
+    </script>
+
 {% endblock %}
 
 {% endblock %}

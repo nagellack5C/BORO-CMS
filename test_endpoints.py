@@ -7,8 +7,8 @@ def add_test_news():
     for i in range(1, 11):
         add_news(
             f'2010-10-{i}',
-            'Тестовая новость!',
-            'https://upload.wikimedia.org/wikipedia/commons/3/3a/Cat03.jpg'
+            'Тестовая новость!'#,
+            # 'https://upload.wikimedia.org/wikipedia/commons/3/3a/Cat03.jpg'
         )
     return "OK!"
 
